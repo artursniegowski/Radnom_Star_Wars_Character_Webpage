@@ -1,5 +1,7 @@
 "use strict"
 
+
+
 // initial value for the maximum amout of people
 let maxNumberOfPeople = 0
 // url of the swapi API
@@ -50,6 +52,12 @@ const elementsCharacterInfo = document.querySelectorAll(".info-random-character"
 let arrayProperties = ['name', 'height', 'mass', 'hair_color', 'skin_color', 'eye_color', 'birth_year', 'gender']
 let arrayNames =['Name: ', 'Height: ', 'Mass: ', 'Hair color: ', 'Skin color: ', 'Eye-color: ', 'Birth year: ', 'Gender: ']
 
+// API with all the pictures for StarWars charcters
+//  https://akabab.github.io/starwars-api/
+const urlStarWarsDataBank = "https://akabab.github.io/starwars-api/api/all.json";
+// getting the HTML elemnt for star wars picture
+const elementImageCharacter = document.getElementById("imageSWCharacter");
+
 // first checking the max number of characters in the API swapi.dev
 async function getMaxUsers (urlBase) {
 
@@ -96,6 +104,17 @@ const getkRandomNumber = (maxValue) => {
 // returning the url of the character for the Iframe
 const getURLForIframe = (urlIframeBase, characterName,sep="_") => urlIframeBase + (characterName.split(" ")).join(sep);
 
+// function for looping through the obj 
+// and fiding the index of the given number
+function retunrIDCharacterImage (obj, numebrGiven) {
+    for(let index = 0; index < obj.length; index++){
+        if (obj[index].id === numebrGiven) {
+            return index;
+        }
+    }
+    return null
+}
+
 // retriving the a random character from the API swapi.dev
 async function getRandomCharacter (urlBase,urlIframeBase,namesAdjustment) {
 
@@ -140,6 +159,16 @@ async function getRandomCharacter (urlBase,urlIframeBase,namesAdjustment) {
 
             // updating the iframe for cross-reference with star wars databank
             imageWeb.src = getURLForIframe(urlIframeBase,data.name,"-");
+
+            // Gettin img url from the API https://akabab.github.io/starwars-api/
+            fetch(urlStarWarsDataBank)
+                .then(response => response.json())
+                .then(starWarsDataBank => {
+                    // console.log(starWarsDataBank)
+                    console.log(retunrIDCharacterImage(starWarsDataBank,randomNumber))
+                    elementImageCharacter.src = starWarsDataBank[retunrIDCharacterImage(starWarsDataBank,randomNumber)]['image'];
+            })
+
 
         } else {
             // throwing an error with useful information about URL if loading failed
