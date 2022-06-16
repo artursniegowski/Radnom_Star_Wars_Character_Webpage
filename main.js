@@ -9,7 +9,6 @@ let urlBase = "https://swapi.dev/api/people/";
 const statusURL = document.getElementById("status");
 
 // default url for iframe
-// let urlIframeBase = "https://starwars.fandom.com/wiki/";
 let urlIframeBase = "https://www.starwars.com/databank/";
 
 // some names need to be adjusted
