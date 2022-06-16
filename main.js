@@ -56,6 +56,7 @@ async function getMaxUsers (urlBase) {
 
     let urlGeneral = urlBase;
 
+    // catching error if one occures during loading
     try {
         let res = await fetch(urlGeneral);
         
@@ -63,6 +64,7 @@ async function getMaxUsers (urlBase) {
             // console.log(res.status);
             // successful loaded data
             let data = await res.json();
+            // returning the max users count from the API
             return Number(data['count'])+1;
         } else {
             throw `Error ${res.status}`;
@@ -76,6 +78,7 @@ async function getMaxUsers (urlBase) {
 // getting the random number 
 const getkRandomNumber = (maxValue) => {
 
+    // selecting a random number based on the max use count in the API
     let randomNumber = 0;
     randomNumber = Math.ceil(Math.random() * maxValue);
 
@@ -97,49 +100,64 @@ const getURLForIframe = (urlIframeBase, characterName,sep="_") => urlIframeBase 
 // retriving the a random character from the API swapi.dev
 async function getRandomCharacter (urlBase,urlIframeBase,namesAdjustment) {
 
+    // status indication for loading
     statusURL.style.color = "blue";
     statusURL.innerText = "Status: LOADING...";
+
+    // getting the reandom number for the API
     let randomNumber = getkRandomNumber(await getMaxUsers(urlBase));
     
+    // parsing the url with the random number for the API
     let urlRandomCharacter = new URL(String(randomNumber)+'/', urlBase);
 
+    // catchin unwanted errors
     try {
+        // comunicating with the API
         let res = await fetch(urlRandomCharacter.href)
 
+        // if successful start convertin the promis to JSON
         if (res.status === 200) {
             console.log(`Successful loaded page ${urlRandomCharacter.href}, code: ${res.status}`);
             // successful loaded data
             let data = await res.json();
-            // console.log(data)
+
             
-            // updating values in the html 
+            // updating values in the html based on retrived data PROMIS
 
             statusURL.innerText = "Status: SUCCESSFUL";
             statusURL.style.color = "green";
 
+            // updating base elemnts 
             elementsCharacterInfo.forEach((node,index) => {
                 node.innerText = `${arrayNames[index]}${data[arrayProperties[index]]}`;
             });
 
+            // adjusting the name
+            // some of the names from the API dont match the starwars databank names !!!
             let nameToAdjust = String(data.name).toLowerCase();
             if (nameToAdjust in namesAdjustment) {
                 data.name = namesAdjustment[nameToAdjust];
             }
 
+            // updating the iframe for cross-reference with star wars databank
             imageWeb.src = getURLForIframe(urlIframeBase,data.name,"-");
 
         } else {
+            // throwing an error with useful information about URL if loading failed
             console.log(`API unreachable, page: ${urlRandomCharacter.href}, code: ${res.status}`);
             throw `Error ${res.status}`;
         }
 
     } catch (error) {
+        // indicating with the status that the loading failed
         statusURL.style.color = "red";
         statusURL.innerText = "Status: Failed";
+        // loging the error to consol for troubleshooting
         console.log(`URL ${urlRandomCharacter.href} exited with error status ${error}`);
         return null;
     } 
 }
 
-// setting an eventlistener for click action on the button
+// setting an eventlistener for click action on the button 
+// and biding the arguments for the called function
 document.getElementById("myBt-Generator").addEventListener("click", getRandomCharacter.bind(null,urlBase,urlIframeBase,namesAdjustment));
